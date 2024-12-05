@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=VT323");
+
 html {
   box-sizing: border-box;
 }
@@ -7,5 +9,77 @@ html {
 *:after {
   box-sizing: inherit;
   margin: 0;
-  font-family: monospace;
+  font-family: "VT323";
+  font-size: 2rem;
+}
+
+header {
+  background-color: white;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  justify-items: stretch;
+  align-items: stretch;
+  height: auto;
+  margin-inline: 0.8rem;
+}
+
+.active,
+.fails {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1.5px solid black;
+  border-right: 1.5px solid black;
+}
+.newgame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1.5px solid black;
+}
+
+.newgame:hover {
+  cursor: pointer;
+  background-color: rgb(217, 217, 217);
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  height: 60vh;
+  margin-inline: 0.8rem;
+}
+
+footer {
+  background-color: white;
+  height: auto;
+  margin-inline: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-gap: 0.2rem;
+  row-gap: 0.2rem;
+}
+
+.letterBtn {
+  border: 2px solid black;
+  cursor: pointer;
+}
+
+.letterBtn:hover {
+  background-color: rgb(217, 217, 217);
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
