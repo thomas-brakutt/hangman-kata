@@ -118,6 +118,8 @@ function handleGuess(event) {
       statusDisplay.style.color = "red"; // Setze die Schriftfarbe
       statusDisplay.style.animation = "blink 1s steps(5, end) infinite"; // aktiviert das blinken (im CSS hinterlegt)
 
+      activeWord.innerText = selectedWord; // zeigt das korrekte Wort an
+
       letterButtons.forEach(
         (button) => (
           (button.disabled = true), (button.style.pointerEvents = "none")
