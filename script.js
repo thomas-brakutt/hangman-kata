@@ -16,8 +16,6 @@ Planung:
 
 */
 
-// Todos:   - groß und kleinschreibung
-
 // Words array
 
 const words = [
@@ -44,7 +42,7 @@ const placeholder = "_";
 const activeWord = document.querySelector(".word"); // Zugriff auf "p-Element im "main-Element"
 const failsDisplay = document.querySelector("#fails"); // Zugriff auf die "Fehleranzeige"
 const letterButtons = document.querySelectorAll(".letterBtn"); // Zugriff auf alle "Buchstaben-Buttons"
-const newGameButton = document.querySelector(".newgame"); // Zugriff auf "p-Element" - "NewGame"
+const newGameButton = document.querySelector(".newgame"); // Zugriff auf den Button für ein neues Spiel
 const statusDisplay = document.querySelector("#active");
 const failsDivBackground = document.querySelector(".fails");
 
