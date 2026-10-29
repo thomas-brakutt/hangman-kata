@@ -1,277 +1,496 @@
-Planung:
+# Lernnotizen – Hangman mit JavaScript 🕹️
 
-1. Spielzustand verwalten:
+Diese Notizen dokumentieren die wichtigsten JavaScript-Grundlagen, die ich beim Entwickeln meines Hangman-Spiels gelernt habe. Sie dienen als **Nachschlagewerk** und orientieren sich an der aktuellen Version des Spiels, in der **Hauptstädte** erraten werden.
 
-- Zufällige Auswahl eines Wortes aus dem Array.
-- Variable für bereits geratene Buchstaben.
-- Zähler für Fehlversuche.
+> **Hinweis:** Die Beispiele verwenden zum Teil feste Wörter wie `"berlin"`, damit die einzelnen Schritte leichter nachvollziehbar sind. Im eigentlichen Spiel wird das Wort zufällig ausgewählt.
 
-2. Event-Listener für die Buttons:
+## Inhaltsverzeichnis
 
-- Überprüfen, ob ein Buchstabe im Wort enthalten ist.
-- Wenn ja: Offenbaren der Position(en) des Buchstabens.
-- Wenn nein: Fehlversuch erhöhen und anzeigen.
-
-3. Spiel Ablauf gewonnen / verloren:
-
-- Überprüfen, ob das Wort vollständig erraten wurde.
-- Überprüfen, ob die maximale Anzahl an Fehlversuchen erreicht wurde.
+1. [Planung und Spielablauf](#1-planung-und-spielablauf)
+2. [Variablen und Spielzustand](#2-variablen-und-spielzustand)
+3. [Ein zufälliges Wort auswählen](#3-ein-zufälliges-wort-auswählen)
+4. [Unterstriche als Platzhalter anzeigen](#4-unterstriche-als-platzhalter-anzeigen)
+5. [Die Wortanzeige aktualisieren](#5-die-wortanzeige-aktualisieren)
+6. [Buchstabeneingaben verarbeiten](#6-buchstabeneingaben-verarbeiten)
+7. [Ein neues Spiel starten](#7-ein-neues-spiel-starten)
+8. [Event-Listener und Buttons](#8-event-listener-und-buttons)
+9. [Wichtige JavaScript-Begriffe](#9-wichtige-javascript-begriffe)
+10. [Frühere Lösungen – nur zur Erinnerung](#10-frühere-lösungen--nur-zur-erinnerung)
 
 ---
 
-zu 1.:
+## 1. Planung und Spielablauf
+
+Beim Hangman-Spiel sind drei Bereiche wichtig:
+
+**Spielzustand verwalten**
+
+- Eine Hauptstadt zufällig aus einer Liste auswählen.
+- Bereits richtig geratene Buchstaben speichern.
+- Falsche Versuche zählen.
+- Das Spiel nach einer Runde zurücksetzen können.
+
+**Auf Benutzeraktionen reagieren**
+
+- Einen Klick auf einen Buchstabenbutton erkennen.
+- Prüfen, ob der Buchstabe im gesuchten Wort vorkommt.
+- Richtige Buchstaben aufdecken oder den Fehlerzähler erhöhen.
+- Bereits benutzte Buttons deaktivieren.
+
+**Spielende erkennen**
+
+- **Gewonnen:** Alle Buchstaben wurden erraten.
+- **Verloren:** Zehn falsche Buchstaben wurden gewählt.
+- Nach dem Spielende weitere Eingaben verhindern, bis eine neue Runde startet.
+
+---
+
+## 2. Variablen und Spielzustand
+
+Der _Spielzustand_ beschreibt alles, was sich während einer Runde verändern kann.
+
+```javascript
+let selectedWord = ""; // Aktuell gesuchte Hauptstadt
+let guessedLetters = []; // Bereits richtig geratene Buchstaben
+let wrongGuesses = 0; // Anzahl falscher Versuche
+
+const maxWrongGuesses = 10; // Höchstzahl falscher Versuche
+const placeholder = "_"; // Zeichen für verdeckte Buchstaben
+```
+
+### `let` und `const`
+
+- **`let`** verwenden wir, wenn ein Wert später neu zugewiesen wird. Beispielsweise erhält `selectedWord` bei jeder neuen Runde ein anderes Wort.
+- **`const`** verwenden wir, wenn die Variable nicht neu zugewiesen werden soll. So bleibt die maximale Fehlerzahl auf `10` festgelegt.
+
+`guessedLetters` ist ein **Array** – also eine Liste. Mit `guessedLetters.push("a")` wird der Buchstabe `"a"` hinzugefügt.
+
+---
+
+## 3. Ein zufälliges Wort auswählen
+
+Im Spiel wird diese Zeile verwendet:
+
+```javascript
 selectedWord = words[Math.floor(Math.random() * words.length)];
+```
 
-1. Math.random():
+Wir zerlegen sie in einzelne Teile.
 
-- generiert eine zufällige Dezimalzahl zwischen 0 (inklusive) und 1 (exklusive). Beispiele: 0.1234, 0.8573.
+### Schritt 1: `Math.random()`
 
-2. Math.random() \* words.length:
-   Warum multiplizieren wir mit words.length?
-   Angenommen, words ist ein Array (z. B. ['Apfel', 'Banane', 'Kirsche']), dann ist words.length die Anzahl der Elemente im Array (hier 3).
-   Durch die Multiplikation von Math.random() mit words.length erhalten wir eine zufällige Zahl zwischen 0 und der Länge des Arrays (z. B. 0 <= x < 3).
+```javascript
+Math.random();
+```
 
-3. Math.floor():
+Erzeugt eine zufällige Dezimalzahl von **0 (einschließlich) bis 1 (ausschließlich)**, beispielsweise `0.1234` oder `0.8573`. Der Wert `1` selbst kommt nicht vor.
 
-- rundet eine Zahl nach unten auf die nächste ganze Zahl. Beispiele:
-  Math.floor(2.9) → 2
-  Math.floor(0.8) → 0
-  Dadurch erzeugen wir einen gültigen Index für das Array, der immer eine ganze Zahl ist.
+### Schritt 2: `words.length`
 
-4. words[Math.floor(...)]:
+`.length` liefert bei einem Array die Zahl der Einträge.
 
-- Der gerundete Wert von Math.floor(...) wird als Index verwendet, um ein Element aus dem Array words zu holen.
-  Beispiel:
-  words = ['Apfel', 'Banane', 'Kirsche']
-  Math.random() → 0.5
-  0.5 \* words.length → 1.5
-  Math.floor(1.5) → 1
-  words[1] → 'Banane'
+```javascript
+const exampleWords = ["berlin", "paris", "rom"];
+console.log(exampleWords.length); // 3
+```
 
-5. Zuweisung zu selectedWord:
-   Das zufällig ausgewählte Wort (z. B. 'Banane') wird der Variablen selectedWord zugewiesen.
-   Zusammenfassung:
-   Diese Methode wählt zufällig ein Element aus dem Array words aus und speichert es in der Variablen selectedWord.
+Durch die Multiplikation `Math.random() * words.length` entsteht eine Zufallszahl zwischen `0` und der Anzahl der Wörter (die obere Grenze ist nicht enthalten).
+
+### Schritt 3: `Math.floor()`
+
+```javascript
+Math.floor(2.9); // 2
+Math.floor(0.8); // 0
+```
+
+`Math.floor()` rundet **ab** und liefert einen ganzzahligen Index. Array-Indizes beginnen bei `0`.
+
+### Schritt 4: Auf ein Array-Element zugreifen
+
+```javascript
+const exampleWords = ["berlin", "paris", "rom"];
+
+// Angenommen, Math.random() ergibt 0.5:
+// 0.5 * 3            = 1.5
+// Math.floor(1.5)    = 1
+// exampleWords[1]    = "paris"
+```
+
+### Schritt 5: Das Wort speichern
+
+Das ausgewählte Wort wird der Variablen `selectedWord` zugewiesen. Bei einem Neustart führt das Spiel diese Auswahl erneut aus.
+
+**Merksatz:** `Math.random()` erzeugt die Zufallszahl, `Math.floor()` macht daraus einen gültigen Array-Index und `words[index]` liefert das Wort.
 
 ---
 
+## 4. Unterstriche als Platzhalter anzeigen
+
+Beim Spielstart ist noch kein Buchstabe aufgedeckt:
+
+```javascript
+activeWord.textContent = (placeholder + " ").repeat(selectedWord.length).trim();
+```
+
+### `selectedWord.length`
+
+Bei einer Zeichenkette gibt `.length` die Anzahl der Zeichen zurück.
+
+```javascript
+const selectedWord = "berlin";
+console.log(selectedWord.length); // 6
+```
+
+### `.repeat(n)`
+
+Wiederholt eine Zeichenkette `n`-mal.
+
+```javascript
+"_ ".repeat(6); // "_ _ _ _ _ _ "
+```
+
+Die Leerzeichen trennen die Unterstriche für eine besser lesbare Darstellung.
+
+### `.trim()`
+
+Entfernt Leerzeichen am **Anfang und Ende** einer Zeichenkette. Das zusätzliche Leerzeichen hinter dem letzten Unterstrich wird dadurch entfernt.
+
+```javascript
+"_ ".repeat(6).trim(); // "_ _ _ _ _ _"
+```
+
+### `textContent`
+
+Mit `textContent` wird der Textinhalt eines HTML-Elements gelesen oder gesetzt.
+
+```javascript
+activeWord.textContent = "_ _ _ _ _ _";
+```
+
+Im Browser sieht man jetzt sechs verdeckte Buchstaben. Anders als `innerHTML` behandelt `textContent` den Wert als Text und nicht als HTML-Code.
+
 ---
 
-zu 2.
-Erklärung "activeWord.textContent = "\_ ".repeat(selectedWord.length).trim();"
+## 5. Die Wortanzeige aktualisieren
 
-Diese Zeile erstellt eine Darstellung eines Wortes, bei dem jeder Buchstabe durch einen
-Unterstrich (_) ersetzt ist.
-Es wird so formatiert, dass die Unterstriche durch Leerzeichen getrennt sind
-(z. B. _ \_ \_ \_ für ein Wort mit 4 Buchstaben).
+Die Funktion `updateWordDisplay()` wird nach einem **richtigen Tipp** ausgeführt. Sie deckt passende Buchstaben auf und prüft, ob das Spiel gewonnen wurde.
 
-1. selectedWord.length
+### Die wichtigsten Schritte
 
-- die Eigenschaft .length gibt die Anzahl der Zeichen in der Zeichenkette selectedWord zurück.
-  Beispiel:
-  selectedWord = "katzi";
-  console.log(selectedWord.length); // Ausgabe: 5
+**1. `.split("")` – Zeichenkette aufteilen**
 
-2. "\_ ".repeat(selectedWord.length)
+```javascript
+"berlin".split("");
+// ["b", "e", "r", "l", "i", "n"]
+```
 
-- Die Methode .repeat(n) erstellt eine neue Zeichenkette, in der die ursprüngliche
-  Zeichenkette n-mal wiederholt wird.
-- Hier wird der String "_ " (Unterstrich + Leerzeichen) so oft wiederholt wie die Länge
-  des Wortes (selectedWord.length).
-  Beispiel:
-  "_ ".repeat(5); // Ausgabe: "\_ \_ \_ \_ \_ "
+**2. `.map()` – Jedes Array-Element verarbeiten**
 
-3. .trim()
+`.map()` erstellt ein **neues Array**, dessen Elemente nach einer Regel umgewandelt wurden. Im Spiel wird für jeden Buchstaben geprüft, ob er bereits geraten wurde.
 
-- die Methode .trim() entfernt alle Leerzeichen am Anfang und Ende einer Zeichenkette.
-  - Warum ist das hier nötig? -> Die Methode .repeat() erzeugt am Ende der Wiederholungen
-    ein zusätzliches Leerzeichen.
-    Beispiel ohne .trim():
-    "_ ".repeat(5); // "_ \_ \_ \_ _ "
-    Mit .trim() wird das überflüssige Leerzeichen am Ende entfernt:
-    "_ ".repeat(5).trim(); // "\_ \_ \_ \_ \_"
+```javascript
+const selectedWord = "berlin";
+const guessedLetters = ["e", "l"];
 
-4. activeWord.textContent
+const displayWord = selectedWord
+  .split("")
+  .map((letter, index) => {
+    if (!guessedLetters.includes(letter)) {
+      return "_";
+    }
 
-- überschreibt den Inhalt des HTML-Elements von "activeWord" auf den erzeugten String.
-- man sieht jetzt so viele Unterstriche, wie das Wort Buchstaben hat, mit jeweils einem Leerzeichen dazwischen.
+    return index === 0 ? letter.toUpperCase() : letter;
+  })
+  .join(" ");
 
-Zusammenfassung der Zeile:
-selectedWord = "katzi" -> erzeugt mit selectedWord.length = 5:
-"_ ".repeat(5); // "_ \_ \_ \_ _ "
-.trim() entfernt das überflüssige Leerzeichen am Ende: // "_ \_ \_ \_ _"
-Das Ergebnis wird als Textinhalt des HTML-Elements activeWord gesetzt:
-activeWord.textContent = "_ \_ \_ \_ \_";
-\*/
+console.log(displayWord); // "_ e _ l _ _"
+```
 
-// --------------------------------------------------------------------------------
+- **`letter`** ist der gerade betrachtete Buchstabe.
+- **`index`** ist seine Position im Wort; die erste Position ist `0`.
+- **`guessedLetters.includes(letter)`** prüft, ob der Buchstabe im Array vorkommt, und gibt `true` oder `false` zurück.
+- Ist der Buchstabe noch nicht geraten, wird ein Unterstrich zurückgegeben.
+- Ist er geraten, wird er angezeigt. An Position `0` wird er mit `toUpperCase()` großgeschrieben.
 
-/\*
-zu 3.
-Erklärung Funktion "updateWordDisplay":
+**3. `.join(" ")` – Array wieder verbinden**
 
-- aktualisiert die Darstellung des zu erratenen Wortes,
-  indem sie aufgedeckte Buchstaben und Platzhalter (\_) für nicht erratene Buchstaben anzeigt.
-  Außerdem prüft sie, ob das Wort vollständig erraten wurde, und zeigt in diesem Fall eine
-  Gewinnmeldung an.
+```javascript
+["_", "e", "_", "l", "_", "_"].join(" ");
+// "_ e _ l _ _"
+```
 
-1. selectedWord.split("")
+**4. Anzeige im Browser aktualisieren**
 
-selectedWord = das zufällig gewählte Wort, das erraten werden soll (z. B. "katzi").
+```javascript
+activeWord.textContent = displayWord;
+```
 
-.split("") - zerlegt das Wort in ein Array aus einzelnen Buchstaben.
-Beispiel: "katzi" → ["k", "a", "t", "z", "i"].
+### Die Gewinnbedingung
 
-2. .map((letter) => ...)
+Im aktuellen Spiel wird geprüft, ob im angezeigten Wort **kein Platzhalter** mehr vorkommt:
 
-.map() - geht durch jedes Element im Array (hier jeden Buchstaben des Wortes) und wandelt es nach
-einer bestimmten Regel um.
-In diesem Fall wird geprüft: guessedLetters.includes(letter)
-Wenn der Buchstabe "letter" in "guessedLetters" enthalten ist, bleibt er erhalten.
-Wenn nicht, wird er durch ein _ ersetzt.
-Beispiel:
-selectedWord = "katzi", guessedLetters = ["a", "t"]
-Ergebnis:
-["k", "a", "t", "z", "i"] → ["_", "a", "t", "_", "_"].
+```javascript
+if (!displayWord.includes(placeholder)) {
+  statusDisplay.textContent = "GEWONNEN 🥳";
+  statusDisplay.style.color = "green";
+  statusDisplay.style.animation = "blink 1s steps(5, end) infinite";
 
-3. .join(" ")
+  letterButtons.forEach((button) => {
+    button.disabled = true;
+  });
+}
+```
 
-- verbindet das Array wieder zu einem String, wobei die Elemente durch ein Leerzeichen
-  getrennt werden.
-  Beispiel:
-  ["_", "a", "t", "_", "_"] zu -> "_ a t _ \_"
+**Warum das Ausrufezeichen `!`?**
 
-4. activeWord.textContent = displayWord;
+- `displayWord.includes("_")` → `true`, solange mindestens ein Unterstrich vorhanden ist.
+- `!displayWord.includes("_")` → `true`, wenn **kein** Unterstrich mehr vorhanden ist.
 
-- der erstellte String ("_ a t _ \_") wird in das HTML-Element activeWord eingefügt,
-  sodass der Spieler die aktuelle Darstellung des Wortes sieht.
+Damit ist das gesamte Wort erraten.
 
-5. if (activeWord.textContent.replace(/\s+/g, "") === selectedWord) {
+**Beispiel:** Sind bei `"berlin"` alle Buchstaben bekannt, wird `"B e r l i n"` angezeigt, und der Gewinnstatus erscheint.
 
-.replace(/\s+/g, "")
+---
 
-- \s+: Findet alle Leerzeichen (einschließlich Tabs, neue Zeilen usw.).
-- /g: Wendet das Muster global auf den gesamten String an.
-- "": Ersetzt die gefundenen Leerzeichen durch nichts, also entfernt sie.
+## 6. Buchstabeneingaben verarbeiten
 
-6. setTimeout(() => alert("You won! 🎉"), 100); = Spiel gewonnen
+Die Funktion `handleGuess(event)` reagiert auf einen Klick auf einen Buchstabenbutton.
 
-- Eine Nachricht ("You won!") wird nach 100 Millisekunden angezeigt.
-- setTimeout sorgt dafür, dass die Animation oder das Update der Darstellung abgeschlossen ist,
-  bevor die Meldung erscheint.
+### Den geklickten Buchstaben ermitteln
 
-7. letterButtons.forEach((button) => (button.disabled = true));
+```javascript
+function handleGuess(event) {
+  const letter = event.target.textContent;
+  event.target.disabled = true;
 
-- hier wird letterButtons (die Buchstaben-Buttons) mit forEach-schleife durchlaufen.
-- jeder Button wird deaktiviert (disabled = true), dass keine weitere Eingaben möglich ist.
+  // Weitere Prüfung …
+}
+```
 
-Beispiel:
-Angenommen:
-selectedWord = "katzi";
-guessedLetters = ["a", "t"];
-selectedWord.split("") → ["k", "a", "t", "z", "i"]
-.map(...) → ["_", "a", "t", "_", "_"]
-.join(" ") → "_ a t _ _"
-activeWord.textContent -> auf dem Display sieht man: "_ a t \_ _"
-Wenn das Wort vollständig erraten wurde:
-guessedLetters = ["k", "a", "t", "z", "i"]
-displayWord = "k a t z i"
-!displayWord.includes("_") ist = true.
-Das Spiel zeigt die Nachricht: "You won! 🎉".
-\*/
+- **`event`** enthält Informationen über das Klickereignis.
+- **`event.target`** bezeichnet das angeklickte Element.
+- **`.textContent`** liest den Buchstaben aus dem Button, zum Beispiel `"a"`.
+- **`.disabled = true`** deaktiviert den Button, damit derselbe Buchstabe in dieser Runde nicht erneut gewählt wird.
 
-// ------------------------------------------------------------------------------
+### Richtiger Buchstabe
 
-/\*
-zu 4.
-Erklärung "function handleGuess(event)":
+```javascript
+if (selectedWord.includes(letter)) {
+  guessedLetters.push(letter);
+  updateWordDisplay();
+}
+```
 
-- verarbeitet das Klicken eines Buchstabens:
-  - prüft, ob der Buchstabe im Wort enthalten ist
-  - aktualisiert den Spielstatus basierend auf dem Ergebnis:
-    - richtig geraten -> Wortanzeige aktualisieren
-    - falsch geraten -> Anzahl der Fehler erhöhen und prüfen, ob das Spiel verloren ist
+- `.includes(letter)` prüft, ob der Buchstabe im Wort vorkommt.
+- `.push(letter)` fügt ihn zum Array der richtigen Tipps hinzu.
+- `updateWordDisplay()` zeigt **alle Positionen** dieses Buchstabens im Wort an.
 
-Erklärung der einzelnen Schritte:
+### Falscher Buchstabe
 
-1. const letter = event.target.textContent;
+```javascript
+wrongGuesses++;
+failsDisplay.textContent = `FEHLER: ${wrongGuesses} / ${maxWrongGuesses}`;
+```
 
-- event repräsentiert das Ereignis des Klickens
-- event.target ist das HTML-Element, das geklickt wurde (Button mit den Buchstaben)
-- .textContent liest den Text des Buttons (also den Buchstaben).
+- **`wrongGuesses++`** erhöht den Fehlerzähler um `1`.
+- Das **Template Literal** mit Backticks und `${...}` setzt Variablenwerte in einen Text ein.
 
-Beispiel:
+Beispiel: Nach zwei falschen Tipps erscheint `FEHLER: 2 / 10`.
 
-1. <button>a</button> wurde geklickt.
-   event.target.textContent ergibt "a".
-   Der Buchstabe wird in der Variablen "letter" gespeichert.
+### Die Hintergrundfarbe verändern
 
-2. event.target.disabled = true;
-   - der geklickte Button wird deaktiviert (disabled = true) = nicht mehr anklickbar
+```javascript
+const red = 255;
+const green = Math.max(200 - wrongGuesses * 10, 0);
+const blue = Math.max(200 - wrongGuesses * 10, 0);
 
-3. if (selectedWord.includes(letter))
-   - prüft, ob der geklickte Buchstabe (letter) im Wort (selectedWord) enthalten ist
+failsDivBackground.style.backgroundColor =
+  "rgb(" + red + ", " + green + ", " + blue + ")";
+```
 
-4. Buchstabe ist korrekt (im Wort enthalten):
-   guessedLetters.push(letter):
+Etwas lesbarer wäre dieselbe Zuweisung mit einem **Template Literal**:
 
-- der Buchstabe wird der Liste guessedLetters hinzugefügt (eine Liste der bisher korrekt geratenen Buchstaben).
+```javascript
+failsDivBackground.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+```
 
-updateWordDisplay();:
+Beide Varianten liefern das gleiche Ergebnis.
 
-- die Funktion updateWordDisplay() wird aufgerufen, um die Darstellung des Wortes
-  im Spiel zu aktualisieren. Zeigt die neu aufgedeckten Buchstaben an.
+- In `rgb(rot, grün, blau)` bestimmen drei Zahlen die Farbe.
+- Rot bleibt bei `255`.
+- Grün und Blau werden mit jedem Fehler kleiner: Die Anzeige wird stärker rot.
+- `Math.max(wert, 0)` sorgt dafür, dass die Werte nicht unter `0` sinken.
 
-5. Buchstabe ist falsch (nicht in selectedWord enthalten):
-   wrongGuesses++:
+### Die Verlustbedingung
 
-- die Anzahl der falschen Versuche (wrongGuesses) wird um 1 erhöht.
+```javascript
+if (wrongGuesses >= maxWrongGuesses) {
+  statusDisplay.textContent = "LEIDER VERLOREN 😭";
+  statusDisplay.style.color = "red";
+  statusDisplay.style.animation = "blink 1s steps(5, end) infinite";
 
-failsDisplay.textContent:
+  activeWord.textContent =
+    selectedWord.charAt(0).toUpperCase() + selectedWord.slice(1);
 
-- die Anzeige der Fehler wird aktualisiert (z. B. FAILS: 2 / 5).
+  letterButtons.forEach((button) => {
+    button.disabled = true;
+  });
+}
+```
 
-6. Spiel verloren (zu viele falsche Versuche):
-   if (wrongGuesses >= maxWrongGuesses):
+- **`>=`** bedeutet „größer oder gleich“. Das Spiel endet nach dem **zehnten** Fehler.
+- **`.charAt(0)`** liest den ersten Buchstaben.
+- **`.toUpperCase()`** macht ihn groß.
+- **`.slice(1)`** liefert alle Zeichen ab dem zweiten Buchstaben.
+- Das richtige Wort wird vollständig angezeigt, z. B. `"Berlin"`.
+- Alle Buchstabenbuttons werden deaktiviert.
 
-- wenn die Anzahl der falschen Versuche (wrongGuesses) die erlaubte Anzahl (maxWrongGuesses)
-  erreicht oder überschreitet, ist das Spiel verloren.
+---
 
-Spiel verloren – Aktionen:
-setTimeout:
+## 7. Ein neues Spiel starten
 
-- nach 100 Millisekunden wird eine Nachricht angezeigt (alert), die das Spielende und
-  das richtige Wort anzeigt.
-  setTimeout gibt dem Spieler eine kurze Zeit, um die letzte Darstellung zu sehen,
-  bevor der Alert erscheint
+Die Funktion `initializeGame()` bereitet den Anfangszustand vor und setzt beim Neustart alles zurück.
 
-letterButtons.forEach(...):
+```javascript
+function initializeGame() {
+  guessedLetters = [];
+  wrongGuesses = 0;
 
-- alle Buchstaben-Buttons werden deaktiviert, sodass keine weiteren Eingaben möglich
-  sind
+  statusDisplay.textContent = "LOS GEHT'S";
+  statusDisplay.style.color = "";
+  statusDisplay.style.animation = "";
+  failsDivBackground.style.backgroundColor = "";
 
-Zusammenfassung der Funktion:
-Der Benutzer klickt auf einen Buchstaben-Button.
-Der Buchstabe wird geprüft:
-Falls richtig: Der Buchstabe wird aufgedeckt.
-Falls falsch: Die Fehleranzahl wird erhöht.
-Bei zu vielen Fehlern wird das Spiel beendet und eine Nachricht angezeigt.
+  selectedWord = words[Math.floor(Math.random() * words.length)];
 
-Beispiel:
-Ausgangszustand:
-selectedWord = "katzi"
-guessedLetters = []
-wrongGuesses = 0
-maxWrongGuesses = 5
-Benutzer klickt auf a:
-letter = "a"
-selectedWord.includes("a") -> true
-Aktionen:
-guessedLetters.push("a") -> guessedLetters = ["a"]
-updateWordDisplay() zeigt: _ a _ \_ \_
-Benutzer klickt auf x:
-letter = "x"
-selectedWord.includes("x") -> false
-Aktionen:
-wrongGuesses++ -> wrongGuesses = 1
-failsDisplay.textContent zeigt: FAILS: 1 / 5
+  activeWord.textContent = (placeholder + " ")
+    .repeat(selectedWord.length)
+    .trim();
+
+  failsDisplay.textContent = `FEHLER: 0 / ${maxWrongGuesses}`;
+
+  letterButtons.forEach((button) => {
+    button.disabled = false;
+  });
+}
+```
+
+Wichtig beim Neustart:
+
+1. Bisherige Tipps und Fehlerzahl zurücksetzen.
+2. Gewinn-/Verlustmeldung, Textfarbe, Animation und Hintergrundfarbe zurücksetzen.
+3. Eine neue Hauptstadt auswählen.
+4. Neue Unterstriche anzeigen.
+5. Fehleranzeige auf `0 / 10` setzen.
+6. Alle Buchstabenbuttons wieder aktivieren.
+
+Eine leere Zeichenkette `""` bei `element.style.color` oder `element.style.animation` entfernt den **direkt per JavaScript gesetzten Inline-Stil**, sodass wieder die CSS-Regeln gelten.
+
+---
+
+## 8. Event-Listener und Buttons
+
+### Auf Klicks reagieren
+
+```javascript
+letterButtons.forEach((button) => {
+  button.addEventListener("click", handleGuess);
+});
+
+newGameButton.addEventListener("click", initializeGame);
+
+// Direkt beim Laden die erste Runde starten:
+initializeGame();
+```
+
+- **`forEach()`** führt eine Funktion für jedes Element einer Liste aus.
+- **`addEventListener("click", ...)`** registriert eine Funktion, die bei einem Klick ausgeführt werden soll.
+- Hier wird **`handleGuess` ohne Klammern** übergeben: Die Funktion soll erst beim Klick ausgeführt werden.
+- Mit **`initializeGame()` samt Klammern** wird die Funktion dagegen sofort aufgerufen, um die erste Runde zu starten.
+
+### Warum genügt `disabled`?
+
+```javascript
+button.disabled = true; // Nicht mehr bedienbar
+button.disabled = false; // Wieder bedienbar
+```
+
+Ein deaktivierter Button reagiert nicht mehr auf Klicks und wird auch semantisch als deaktiviert erkannt. Ein zusätzliches `button.style.pointerEvents = "none"` ist dafür nicht nötig und könnte beim Neustart versehentlich aktiv bleiben.
+
+---
+
+## 9. Wichtige JavaScript-Begriffe
+
+| Begriff         | Bedeutung im Hangman-Spiel                                |
+| --------------- | --------------------------------------------------------- |
+| `Array`         | Liste von Wörtern oder geratenen Buchstaben               |
+| `let`           | Variable, deren Wert später neu zugewiesen wird           |
+| `const`         | Variable, die nicht neu zugewiesen werden soll            |
+| `.length`       | Anzahl der Array-Einträge oder Zeichen einer Zeichenkette |
+| `.includes()`   | Prüft, ob ein Wert vorkommt                               |
+| `.push()`       | Fügt einem Array einen Eintrag hinzu                      |
+| `.split("")`    | Zerlegt eine Zeichenkette in einzelne Zeichen             |
+| `.map()`        | Erstellt ein neues Array durch Umwandlung der Einträge    |
+| `.join(" ")`    | Verbindet Array-Einträge zu einer Zeichenkette            |
+| `.repeat()`     | Wiederholt eine Zeichenkette                              |
+| `.trim()`       | Entfernt Leerzeichen am Anfang und Ende                   |
+| `.forEach()`    | Führt eine Funktion für jeden Eintrag aus                 |
+| `textContent`   | Liest oder setzt den Text eines HTML-Elements             |
+| `event.target`  | Element, das ein Ereignis ausgelöst hat                   |
+| `disabled`      | Deaktiviert oder aktiviert einen Button                   |
+| `>=`            | Vergleich „größer oder gleich“                            |
+| `!`             | Logisches NICHT: kehrt `true` und `false` um              |
+| `++`            | Erhöht eine Zahl um eins                                  |
+| `` `${wert}` `` | Fügt Werte in ein Template Literal ein                    |
+
+---
+
+## 10. Frühere Lösungen – nur zur Erinnerung
+
+Die folgenden Techniken waren in einer **älteren Version** des Spiels enthalten. Sie sind **nicht Teil der aktuellen Spiellogik**, bleiben aber als Lernstoff interessant.
+
+### Alte Gewinnprüfung mit `replace()` und regulärem Ausdruck
+
+```javascript
+activeWord.textContent.replace(/\s+/g, "") === selectedWord;
+```
+
+- **`\s`** steht für ein Leerraumzeichen (etwa ein Leerzeichen oder einen Tab).
+- **`+`** bedeutet „eines oder mehrere“.
+- **`g`** steht für „global“: Alle passenden Stellen werden ersetzt.
+- **`replace(/\s+/g, "")`** entfernt also sämtliche Leerraumzeichen.
+
+Diese frühere Prüfung verglich die Anzeige ohne Leerzeichen mit dem gesuchten Wort. Die neue Version zeigt den ersten Buchstaben jedoch groß an. Ein einfacher Zeichenkettenvergleich wäre dadurch nicht mehr zuverlässig, da JavaScript zwischen Groß- und Kleinschreibung unterscheidet.
+
+**Aktuelle Lösung:**
+
+```javascript
+if (!displayWord.includes(placeholder)) {
+  // Gewonnen: Es sind keine Unterstriche mehr sichtbar.
+}
+```
+
+### Alte Meldung mit `setTimeout()` und `alert()`
+
+```javascript
+setTimeout(() => alert("You won! 🎉"), 100);
+```
+
+- **`setTimeout()`** plant die Ausführung einer Funktion nach einer bestimmten Wartezeit.
+- **`100`** bedeutet 100 Millisekunden.
+- **`alert()`** öffnet ein Browserdialogfenster.
+- **`() => ...`** ist eine Arrow-Funktion.
+
+**Aktuelle Lösung:** Das Spiel schreibt Gewinn- und Verlustmeldungen direkt in die Statusanzeige und verwendet die CSS-Animation `blink`. Es öffnet kein `alert()`-Fenster mehr.
+
+---
+
+## Mein wichtigstes Lernprinzip
+
+Eine Funktion sollte eine klar erkennbare Aufgabe erfüllen:
+
+- **`initializeGame()`** → Neue Spielrunde vorbereiten.
+- **`handleGuess()`** → Einen Buchstaben prüfen und Fehler zählen.
+- **`updateWordDisplay()`** → Wort aktualisieren und Gewinn erkennen.
+
+So kann ich den Code leichter **lesen, testen, korrigieren und später erweitern**.
