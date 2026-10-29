@@ -31,16 +31,36 @@ header {
   border-bottom: 1.5px solid black;
   border-right: 1.5px solid black;
 }
+
+/* Button zum Starten einer neuen Spielrunde */
+
 .newgame {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border: none;
   border-bottom: 1.5px solid black;
+  background-color: white;
+
+  cursor: pointer;
+  min-height: 60px;
+  padding: 0.5rem;
 }
 
 .newgame:hover {
-  cursor: pointer;
   background-color: rgb(217, 217, 217);
+}
+
+.newgame:focus-visible,
+.letterBtn:focus-visible {
+  outline: 3px solid royalblue;
+  outline-offset: 2px;
+}
+
+.letterBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
 main {
@@ -50,7 +70,8 @@ main {
   align-items: center;
   gap: 2rem;
   background-color: white;
-  height: 60vh;
+  min-height: 60vh;
+  padding: 2rem 1rem;
   margin-inline: 0.8rem;
 }
 
@@ -64,7 +85,7 @@ main {
   text-align: center;
 }
 
-footer {
+.keyboard {
   background-color: white;
   height: auto;
   margin-inline: 0.8rem;
@@ -94,28 +115,6 @@ footer {
   100% {
     opacity: 1;
   }
-}
-
-/* Neues Spiel als richtiger Button */
-
-.newgame {
-  border: none;
-  border-bottom: 1.5px solid black;
-  background-color: white;
-  cursor: pointer;
-  min-height: 60px;
-  padding: 0.5rem;
-}
-
-.newgame:focus-visible,
-.letterBtn:focus-visible {
-  outline: 3px solid royalblue;
-  outline-offset: 2px;
-}
-
-.letterBtn:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
 }
 
 /* Responsive Design für Smartphones */
@@ -162,7 +161,7 @@ footer {
     overflow-wrap: anywhere;
   }
 
-  footer {
+  .keyboard {
     grid-template-columns: repeat(6, minmax(0, 1fr));
     grid-template-rows: auto;
     gap: 4px;

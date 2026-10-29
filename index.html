@@ -12,10 +12,10 @@
 
     <header>
         <div class="active">
-            <p id="active">LOS GEHTS</p>
+            <p id="active" role="status" aria-live="polite">LOS GEHT'S</p>
         </div>
         <div class="fails">
-            <P id="fails"> FEHLER: 0 / 10</P>
+            <p id="fails"> FEHLER: 0 / 10</p>
         </div>
 
         <button type="button" class="newgame" id="newgame">
@@ -25,11 +25,11 @@
     </header>
 
     <main>
-        <p class="category-hint">Gesucht wird eine Hauptstadt!</p>
+        <h1 class="category-hint">Gesucht wird eine Hauptstadt!</h1>
         <p class="word"></p>
     </main>
 
-    <footer>
+    <section class="keyboard" aria-label="Buchstabentastatur">
         <button class="letterBtn">a</button>
         <button class="letterBtn">b</button>
         <button class="letterBtn">c</button>
@@ -57,7 +57,7 @@
         <button class="letterBtn">y</button>
         <button class="letterBtn">z</button>
 
-    </footer>
+    </section>
     <script src="script.js"></script>
 
 </body>
