@@ -71,24 +71,33 @@ function initializeGame() {
 }
 
 // Funktion zum aktualisieren des Wortes im Spiel -> Erklärung Funktion siehe unten zu 3.
+
 function updateWordDisplay() {
   const displayWord = selectedWord
     .split("")
-    .map((letter) => (guessedLetters.includes(letter) ? letter : placeholder))
+    .map((letter, index) => {
+      if (!guessedLetters.includes(letter)) {
+        return placeholder;
+      }
+
+      // Den ersten Buchstaben groß anzeigen
+      return index === 0 ? letter.toUpperCase() : letter;
+    })
     .join(" ");
+
   activeWord.textContent = displayWord;
 
-  if (activeWord.textContent.replace(/\s+/g, "") === selectedWord) {
+  // Gewonnen, wenn keine Unterstriche mehr vorhanden sind
+  if (!displayWord.includes(placeholder)) {
     statusDisplay.textContent = "GEWONNEN 🥳";
-    statusDisplay.style.color = "green"; // Setze die Schriftfarbe
-    statusDisplay.style.animation = "blink 1s steps(5, end) infinite"; // aktiviert das blinken (im CSS hinterlegt)
+    statusDisplay.style.color = "green";
+    statusDisplay.style.animation = "blink 1s steps(5, end) infinite";
 
-    letterButtons.forEach(
-      (button) => (
-        (button.disabled = true),
-        (button.style.pointerEvents = "none")
-      ),
-    );
+    // Alle Buchstaben-Buttons deaktivieren
+    letterButtons.forEach((button) => {
+      button.disabled = true;
+      button.style.pointerEvents = "none";
+    });
   }
 }
 
@@ -118,7 +127,9 @@ function handleGuess(event) {
       statusDisplay.style.color = "red"; // Setze die Schriftfarbe
       statusDisplay.style.animation = "blink 1s steps(5, end) infinite"; // aktiviert das blinken (im CSS hinterlegt)
 
-      activeWord.innerText = selectedWord; // zeigt das korrekte Wort an
+      // zeigt das korrekte Wort an
+      activeWord.textContent =
+        selectedWord.charAt(0).toUpperCase() + selectedWord.slice(1);
 
       letterButtons.forEach(
         (button) => (

@@ -45,11 +45,23 @@ header {
 
 main {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 2rem;
   background-color: white;
   height: 60vh;
   margin-inline: 0.8rem;
+}
+
+/* Hinweis auf die gesuchte Kategorie */
+.category-hint {
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.word {
+  text-align: center;
 }
 
 footer {
@@ -135,6 +147,13 @@ footer {
     min-height: 35vh;
     padding: 2rem 0.5rem;
     margin-inline: 0.5rem;
+  }
+
+  /* Kategorie-Hinweis auf Smartphones */
+
+  .category-hint {
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   .word {
