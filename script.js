@@ -19,17 +19,18 @@ Planung:
 // Todos:   - groß und kleinschreibung
 
 // Words array
+
 const words = [
-  "jessika",
-  "thomas",
-  "laila",
-  "lilly",
-  "caroline",
-  "oma",
-  "opa",
-  "lailib",
-  "theo",
-  "katzi",
+  "berlin",
+  "paris",
+  "london",
+  "rom",
+  "madrid",
+  "wien",
+  "prag",
+  "oslo",
+  "bern",
+  "tokio",
 ];
 
 // Game state variables
@@ -67,7 +68,7 @@ function initializeGame() {
 
   // alle Buchstaben-Buttons werden resettet und styles wieder aktiviert (wieder anklickbar + hover) mit forEach-Schleife
   letterButtons.forEach((button) => {
-    (button.disabled = false), (button.style.pointerEvents = "");
+    ((button.disabled = false), (button.style.pointerEvents = ""));
   });
 }
 
@@ -86,8 +87,9 @@ function updateWordDisplay() {
 
     letterButtons.forEach(
       (button) => (
-        (button.disabled = true), (button.style.pointerEvents = "none")
-      )
+        (button.disabled = true),
+        (button.style.pointerEvents = "none")
+      ),
     );
   }
 }
@@ -122,8 +124,9 @@ function handleGuess(event) {
 
       letterButtons.forEach(
         (button) => (
-          (button.disabled = true), (button.style.pointerEvents = "none")
-        )
+          (button.disabled = true),
+          (button.style.pointerEvents = "none")
+        ),
       );
     }
   }
@@ -131,7 +134,7 @@ function handleGuess(event) {
 
 // Add event listeners
 letterButtons.forEach((button) =>
-  button.addEventListener("click", handleGuess)
+  button.addEventListener("click", handleGuess),
 );
 newGameButton.addEventListener("click", initializeGame);
 
